@@ -10,6 +10,7 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Initialize seed data
   await storage.seedData();
+  await storage.addMissingItems();
 
   app.get(api.categories.list.path, async (req, res) => {
     const categories = await storage.getCategories();

@@ -87,6 +87,8 @@ export class DatabaseStorage implements IStorage {
         { categoryId: printCat.id, name: "Business Cards", description: "Premium matte or glossy business cards", price: "Starting at $20/100", imageUrl: "https://images.unsplash.com/photo-1593182440959-9d5165b29b59?w=800&q=80" },
         { categoryId: printCat.id, name: "Custom T-Shirts", description: "DTG or Screen Printing on high quality cotton", price: "$15 each", imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80" },
         { categoryId: printCat.id, name: "Large Format Banners", description: "Durable vinyl banners for events", price: "$5/sq ft", imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" },
+        { categoryId: printCat.id, name: "Monogramming", description: "Personalized embroidery and monogramming on apparel", price: "$10-$50", imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
+        { categoryId: printCat.id, name: "DTF Printing", description: "Direct-to-fabric printing for vibrant, detailed designs", price: "$8-$25 per piece", imageUrl: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80" },
         
         // Accessories
         { categoryId: accCat.id, name: "Mechanical Keyboard", description: "RGB Backlit Mechanical Gaming Keyboard", price: "$49.99", imageUrl: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800&q=80" },
@@ -114,6 +116,39 @@ export class DatabaseStorage implements IStorage {
         { categoryId: regCat.id, name: "Trademark Filing", description: "Protect your brand with trademark registration", price: "$300-$800", imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80" },
         { categoryId: regCat.id, name: "Vendor Registration", description: "E-commerce vendor and seller registration", price: "$50-$150", imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80" },
       ]);
+    }
+  }
+
+  async addMissingItems(): Promise<void> {
+    const printCat = await this.getCategoryBySlug("printing");
+    if (!printCat) return;
+
+    // Check if these items already exist
+    const existingItems = await db.select().from(items).where(eq(items.categoryId, printCat.id));
+    const existingNames = new Set(existingItems.map(i => i.name));
+
+    const newItems = [];
+    if (!existingNames.has("Monogramming")) {
+      newItems.push({
+        categoryId: printCat.id,
+        name: "Monogramming",
+        description: "Personalized embroidery and monogramming on apparel",
+        price: "$10-$50",
+        imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+      });
+    }
+    if (!existingNames.has("DTF Printing")) {
+      newItems.push({
+        categoryId: printCat.id,
+        name: "DTF Printing",
+        description: "Direct-to-fabric printing for vibrant, detailed designs",
+        price: "$8-$25 per piece",
+        imageUrl: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80"
+      });
+    }
+
+    if (newItems.length > 0) {
+      await db.insert(items).values(newItems);
     }
   }
 }
