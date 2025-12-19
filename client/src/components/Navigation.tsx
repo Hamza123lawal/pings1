@@ -1,12 +1,36 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, ShoppingBag, Printer, Monitor, BookOpen } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, ShoppingBag, Printer, Monitor, BookOpen, ShoppingCart } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 export function Navigation() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const sessionId = localStorage.getItem("sessionId") || Math.random().toString(36).substring(7);
+    if (!localStorage.getItem("sessionId")) {
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    const fetchCart = async () => {
+      try {
+        const response = await fetch(`/api/cart/${sessionId}`);
+        const cart = await response.json();
+        const count = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
+        setCartCount(count);
+      } catch (err) {
+        console.error("Failed to fetch cart", err);
+      }
+    };
+
+    fetchCart();
+    const interval = setInterval(fetchCart, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const links = [
     { href: "/", label: "Home" },
@@ -44,10 +68,30 @@ export function Navigation() {
                 Get a Quote
               </Button>
             </Link>
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative" data-testid="button-cart">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Nav */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-2">
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative" data-testid="button-cart-mobile">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
