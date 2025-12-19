@@ -3,9 +3,11 @@ import {
   items,
   categories,
   messages,
+  cartItems,
   type Item,
   type Category,
   type Message,
+  type CartItem,
   type InsertMessage
 } from "@shared/schema";
 import { eq } from "drizzle-orm";
@@ -16,6 +18,10 @@ export interface IStorage {
   getItems(categorySlug?: string): Promise<Item[]>;
   getItem(id: number): Promise<Item | undefined>;
   createMessage(message: InsertMessage): Promise<Message>;
+  getCart(sessionId: string): Promise<(CartItem & { item: Item })[]>;
+  addToCart(sessionId: string, itemId: number, quantity: number): Promise<CartItem>;
+  updateCartItem(cartItemId: number, quantity: number): Promise<CartItem>;
+  removeFromCart(cartItemId: number): Promise<void>;
   seedData(): Promise<void>;
 }
 
@@ -46,6 +52,58 @@ export class DatabaseStorage implements IStorage {
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const [message] = await db.insert(messages).values(insertMessage).returning();
     return message;
+  }
+
+  async getCart(sessionId: string): Promise<(CartItem & { item: Item })[]> {
+    const cartWithItems = await db
+      .select()
+      .from(cartItems)
+      .where(eq(cartItems.sessionId, sessionId));
+    
+    const enriched = await Promise.all(
+      cartWithItems.map(async (cartItem) => {
+        const item = await this.getItem(cartItem.itemId);
+        return { ...cartItem, item: item! };
+      })
+    );
+    return enriched;
+  }
+
+  async addToCart(sessionId: string, itemId: number, quantity: number): Promise<CartItem> {
+    // Check if item already in cart
+    const existing = await db
+      .select()
+      .from(cartItems)
+      .where(eq(cartItems.sessionId, sessionId) && eq(cartItems.itemId, itemId));
+    
+    if (existing.length > 0) {
+      // Update quantity
+      const [updated] = await db
+        .update(cartItems)
+        .set({ quantity: existing[0].quantity + quantity })
+        .where(eq(cartItems.id, existing[0].id))
+        .returning();
+      return updated;
+    }
+
+    const [newItem] = await db
+      .insert(cartItems)
+      .values({ sessionId, itemId, quantity })
+      .returning();
+    return newItem;
+  }
+
+  async updateCartItem(cartItemId: number, quantity: number): Promise<CartItem> {
+    const [updated] = await db
+      .update(cartItems)
+      .set({ quantity })
+      .where(eq(cartItems.id, cartItemId))
+      .returning();
+    return updated;
+  }
+
+  async removeFromCart(cartItemId: number): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.id, cartItemId));
   }
 
   async seedData(): Promise<void> {

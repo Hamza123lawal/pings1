@@ -26,11 +26,21 @@ export const messages = pgTable("messages", {
   message: text("message").notNull(),
 });
 
+export const cartItems = pgTable("cart_items", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  itemId: integer("item_id").notNull(),
+  quantity: integer("quantity").notNull().default(1),
+});
+
 export const insertMessageSchema = createInsertSchema(messages).omit({ id: true });
 export const insertItemSchema = createInsertSchema(items).omit({ id: true });
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true });
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true });
 
 export type Item = typeof items.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Message = typeof messages.$inferSelect;
+export type CartItem = typeof cartItems.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;

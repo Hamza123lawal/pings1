@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertMessageSchema, items, categories } from './schema';
+import { insertMessageSchema, items, categories, insertCartItemSchema } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -59,6 +59,63 @@ export const api = {
       responses: {
         201: z.custom<typeof insertMessageSchema>(),
         400: errorSchemas.validation,
+      },
+    },
+  },
+  cart: {
+    getCart: {
+      method: 'GET' as const,
+      path: '/api/cart/:sessionId',
+      responses: {
+        200: z.array(z.object({
+          id: z.number(),
+          sessionId: z.string(),
+          itemId: z.number(),
+          quantity: z.number(),
+          item: z.custom<typeof items.$inferSelect>(),
+        })),
+      },
+    },
+    addItem: {
+      method: 'POST' as const,
+      path: '/api/cart',
+      input: z.object({
+        sessionId: z.string(),
+        itemId: z.number(),
+        quantity: z.number().int().min(1).default(1),
+      }),
+      responses: {
+        201: z.object({
+          id: z.number(),
+          sessionId: z.string(),
+          itemId: z.number(),
+          quantity: z.number(),
+        }),
+        400: errorSchemas.validation,
+      },
+    },
+    updateItem: {
+      method: 'PATCH' as const,
+      path: '/api/cart/:id',
+      input: z.object({
+        quantity: z.number().int().min(1),
+      }),
+      responses: {
+        200: z.object({
+          id: z.number(),
+          sessionId: z.string(),
+          itemId: z.number(),
+          quantity: z.number(),
+        }),
+        404: errorSchemas.notFound,
+      },
+    },
+    removeItem: {
+      method: 'DELETE' as const,
+      path: '/api/cart/:id',
+      responses: {
+        204: z.void(),
+        404: errorSchemas.notFound,
       },
     },
   },

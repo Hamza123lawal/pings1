@@ -54,5 +54,48 @@ export async function registerRoutes(
     }
   });
 
+  app.get(api.cart.getCart.path, async (req, res) => {
+    const cart = await storage.getCart(req.params.sessionId);
+    res.json(cart);
+  });
+
+  app.post(api.cart.addItem.path, async (req, res) => {
+    try {
+      const input = api.cart.addItem.input.parse(req.body);
+      const cartItem = await storage.addToCart(input.sessionId, input.itemId, input.quantity);
+      res.status(201).json(cartItem);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+        });
+      }
+      throw err;
+    }
+  });
+
+  app.patch(api.cart.updateItem.path, async (req, res) => {
+    try {
+      const input = api.cart.updateItem.input.parse(req.body);
+      const cartItem = await storage.updateCartItem(Number(req.params.id), input.quantity);
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+      res.json(cartItem);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+        });
+      }
+      throw err;
+    }
+  });
+
+  app.delete(api.cart.removeItem.path, async (req, res) => {
+    await storage.removeFromCart(Number(req.params.id));
+    res.status(204).send();
+  });
+
   return httpServer;
 }
