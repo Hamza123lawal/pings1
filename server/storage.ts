@@ -50,39 +50,71 @@ export class DatabaseStorage implements IStorage {
 
   async seedData(): Promise<void> {
     const existingCats = await this.getCategories();
-    if (existingCats.length > 0) return;
-
-    // Insert Categories
-    const cats = await db.insert(categories).values([
+    
+    // Define all categories we want
+    const categoryData = [
       { name: "Printing Services", slug: "printing", description: "High quality banners, flyers, cards & t-shirts" },
       { name: "Computer Accessories", slug: "accessories", description: "Peripherals and hardware" },
       { name: "Typing Services", slug: "typing", description: "Professional typing and documentation" },
       { name: "Training", slug: "training", description: "Skill development and courses" },
-    ]).returning();
+      { name: "Laptop Repair", slug: "laptop-repair", description: "Hardware and software repair services" },
+      { name: "Website Creation", slug: "website-creation", description: "Professional website design and development" },
+      { name: "Registration Services", slug: "registration", description: "Business and official registration support" },
+    ];
 
-    // Insert Items
-    const printCat = cats.find(c => c.slug === "printing")!;
-    const accCat = cats.find(c => c.slug === "accessories")!;
-    const typeCat = cats.find(c => c.slug === "typing")!;
-    const trainCat = cats.find(c => c.slug === "training")!;
+    // Add missing categories
+    const existingSlugs = new Set(existingCats.map(c => c.slug));
+    const missingCats = categoryData.filter(c => !existingSlugs.has(c.slug));
+    
+    let cats = existingCats;
+    if (missingCats.length > 0) {
+      const newCats = await db.insert(categories).values(missingCats).returning();
+      cats = [...cats, ...newCats];
+    }
 
-    await db.insert(items).values([
-      // Printing
-      { categoryId: printCat.id, name: "Business Cards", description: "Premium matte or glossy business cards", price: "Starting at $20/100", imageUrl: "https://images.unsplash.com/photo-1593182440959-9d5165b29b59?w=800&q=80" },
-      { categoryId: printCat.id, name: "Custom T-Shirts", description: "DTG or Screen Printing on high quality cotton", price: "$15 each", imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80" },
-      { categoryId: printCat.id, name: "Large Format Banners", description: "Durable vinyl banners for events", price: "$5/sq ft", imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" },
-      
-      // Accessories
-      { categoryId: accCat.id, name: "Mechanical Keyboard", description: "RGB Backlit Mechanical Gaming Keyboard", price: "$49.99", imageUrl: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800&q=80" },
-      { categoryId: accCat.id, name: "Wireless Mouse", description: "Ergonomic wireless optical mouse", price: "$19.99", imageUrl: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&q=80" },
-      
-      // Typing
-      { categoryId: typeCat.id, name: "Document Typing", description: "Fast and accurate typing from handwritten notes", price: "$5/page", imageUrl: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=800&q=80" },
-      
-      // Training
-      { categoryId: trainCat.id, name: "Basic Computer Skills", description: "Learn Windows, Office, and Internet basics", price: "$100/course", imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80" },
-      { categoryId: trainCat.id, name: "Graphic Design Basics", description: "Intro to Photoshop and Illustrator", price: "$150/course", imageUrl: "https://images.unsplash.com/photo-1626785774573-4b799314346d?w=800&q=80" },
-    ]);
+    // Only add items if we just created categories (initial seed)
+    if (existingCats.length === 0) {
+      const printCat = cats.find(c => c.slug === "printing")!;
+      const accCat = cats.find(c => c.slug === "accessories")!;
+      const typeCat = cats.find(c => c.slug === "typing")!;
+      const trainCat = cats.find(c => c.slug === "training")!;
+      const repairCat = cats.find(c => c.slug === "laptop-repair")!;
+      const webCat = cats.find(c => c.slug === "website-creation")!;
+      const regCat = cats.find(c => c.slug === "registration")!;
+
+      await db.insert(items).values([
+        // Printing
+        { categoryId: printCat.id, name: "Business Cards", description: "Premium matte or glossy business cards", price: "Starting at $20/100", imageUrl: "https://images.unsplash.com/photo-1593182440959-9d5165b29b59?w=800&q=80" },
+        { categoryId: printCat.id, name: "Custom T-Shirts", description: "DTG or Screen Printing on high quality cotton", price: "$15 each", imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80" },
+        { categoryId: printCat.id, name: "Large Format Banners", description: "Durable vinyl banners for events", price: "$5/sq ft", imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" },
+        
+        // Accessories
+        { categoryId: accCat.id, name: "Mechanical Keyboard", description: "RGB Backlit Mechanical Gaming Keyboard", price: "$49.99", imageUrl: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=800&q=80" },
+        { categoryId: accCat.id, name: "Wireless Mouse", description: "Ergonomic wireless optical mouse", price: "$19.99", imageUrl: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&q=80" },
+        
+        // Typing
+        { categoryId: typeCat.id, name: "Document Typing", description: "Fast and accurate typing from handwritten notes", price: "$5/page", imageUrl: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=800&q=80" },
+        
+        // Training
+        { categoryId: trainCat.id, name: "Basic Computer Skills", description: "Learn Windows, Office, and Internet basics", price: "$100/course", imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&q=80" },
+        { categoryId: trainCat.id, name: "Graphic Design Basics", description: "Intro to Photoshop and Illustrator", price: "$150/course", imageUrl: "https://images.unsplash.com/photo-1626785774573-4b799314346d?w=800&q=80" },
+        
+        // Laptop Repair
+        { categoryId: repairCat.id, name: "Screen Replacement", description: "Professional laptop screen replacement and repair", price: "$80-$200", imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" },
+        { categoryId: repairCat.id, name: "Battery Replacement", description: "Genuine laptop battery replacement", price: "$40-$80", imageUrl: "https://images.unsplash.com/photo-1625948515291-69613efd103f?w=800&q=80" },
+        { categoryId: repairCat.id, name: "Hardware Upgrade", description: "RAM and SSD upgrades to boost performance", price: "$50-$300", imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" },
+        
+        // Website Creation
+        { categoryId: webCat.id, name: "Business Website", description: "Custom responsive website for your business", price: "$500-$2000", imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80" },
+        { categoryId: webCat.id, name: "E-commerce Store", description: "Online store with payment processing", price: "$1000-$3000", imageUrl: "https://images.unsplash.com/photo-1611537929991-481f237f5000?w=800&q=80" },
+        { categoryId: webCat.id, name: "Website Redesign", description: "Modernize and optimize your existing website", price: "$300-$1000", imageUrl: "https://images.unsplash.com/photo-1626785774573-4b799314346d?w=800&q=80" },
+        
+        // Registration Services
+        { categoryId: regCat.id, name: "Business Registration", description: "Company incorporation and business registration", price: "$200-$500", imageUrl: "https://images.unsplash.com/photo-1450101499163-c8917c3b1c7d?w=800&q=80" },
+        { categoryId: regCat.id, name: "Trademark Filing", description: "Protect your brand with trademark registration", price: "$300-$800", imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80" },
+        { categoryId: regCat.id, name: "Vendor Registration", description: "E-commerce vendor and seller registration", price: "$50-$150", imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80" },
+      ]);
+    }
   }
 }
 
