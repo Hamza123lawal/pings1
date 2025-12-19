@@ -6,10 +6,57 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function Shop() {
   const { data: categories } = useCategories();
   const { data: items, isLoading } = useItems();
+  const { toast } = useToast();
+  const [addingToCart, setAddingToCart] = useState<number | null>(null);
+
+  const handleAddToCart = async (itemId: number, itemName: string, itemPrice: string) => {
+    setAddingToCart(itemId);
+    try {
+      const sessionId = localStorage.getItem("sessionId") || Math.random().toString(36).substring(7);
+      if (!localStorage.getItem("sessionId")) {
+        localStorage.setItem("sessionId", sessionId);
+      }
+
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          itemId,
+          quantity: 1,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Added to Cart",
+          description: `${itemName} has been added to your cart`,
+        });
+        window.dispatchEvent(new Event("cartUpdated"));
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add item to cart",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to add to cart", err);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingToCart(null);
+    }
+  }
 
   // Filter only accessories category if it exists, otherwise show all items that look like products
   // Ideally this logic should be in the backend or have a specific 'type' field, but relying on category names for now
@@ -73,8 +120,14 @@ export default function Shop() {
                     <div className="mt-4 font-bold text-xl text-primary">{item.price}</div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full gap-2 group">
-                      <ShoppingBag className="h-4 w-4 group-hover:animate-bounce" /> Add to Cart
+                    <Button 
+                      className="w-full gap-2 group"
+                      onClick={() => handleAddToCart(item.id, item.name, item.price)}
+                      disabled={addingToCart === item.id}
+                      data-testid={`button-add-to-cart-${item.id}`}
+                    >
+                      <ShoppingBag className="h-4 w-4 group-hover:animate-bounce" /> 
+                      {addingToCart === item.id ? "Adding..." : "Add to Cart"}
                     </Button>
                   </CardFooter>
                 </Card>

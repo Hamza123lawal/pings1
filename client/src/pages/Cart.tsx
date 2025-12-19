@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
 
 interface CartItemWithProduct {
   id: number;
@@ -69,10 +70,24 @@ export default function Cart() {
     }
   };
 
-  const total = cartItems.reduce((sum, item) => {
-    const price = parseFloat(item.item.price.replace(/[^0-9.-]/g, "")) || 0;
+  const calculatePrice = (priceStr: string): number => {
+    const numStr = priceStr.replace(/[^0-9.-]/g, "");
+    return parseFloat(numStr) || 0;
+  };
+
+  const subtotal = cartItems.reduce((sum, item) => {
+    const price = calculatePrice(item.item.price);
     return sum + price * item.quantity;
   }, 0);
+
+  const TAX_RATE = 0.1; // 10% tax
+  const SHIPPING_RATE = 0.05; // 5% of subtotal for shipping
+  const HANDLING_FEE = 2.5; // Fixed $2.50 handling fee
+
+  const tax = subtotal * TAX_RATE;
+  const shipping = Math.max(subtotal * SHIPPING_RATE, 5); // Minimum $5 shipping
+  const handling = cartItems.length > 0 ? HANDLING_FEE : 0;
+  const total = subtotal + tax + shipping + handling;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -160,13 +175,39 @@ export default function Cart() {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Items:</span>
-                    <span className="font-semibold">{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
-                  </div>
-                  <div className="border-t pt-4 flex justify-between text-lg font-bold">
-                    <span>Total:</span>
-                    <span className="text-primary">${total.toFixed(2)}</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Items ({cartItems.reduce((sum, item) => sum + item.quantity, 0)}):</span>
+                      <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-2 py-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Subtotal:</span>
+                        <span>${subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Shipping:</span>
+                        <span>${shipping.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Handling Fee:</span>
+                        <span>${handling.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tax (10%):</span>
+                        <span>${tax.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex justify-between text-lg font-bold pt-2">
+                      <span>Total to Pay:</span>
+                      <span className="text-primary text-xl">${total.toFixed(2)}</span>
+                    </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2">

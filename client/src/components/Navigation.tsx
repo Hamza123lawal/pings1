@@ -28,8 +28,14 @@ export function Navigation() {
     };
 
     fetchCart();
-    const interval = setInterval(fetchCart, 1000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchCart, 500);
+    const handleCartUpdate = () => fetchCart();
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
   }, []);
 
   const links = [
