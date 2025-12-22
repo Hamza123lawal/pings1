@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import logoUrl from "@assets/logo_1766422303390.png";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -50,10 +51,8 @@ export function Navigation() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <div className="bg-primary text-primary-foreground p-1.5 rounded-lg">
-              <Printer className="h-5 w-5" />
-            </div>
-            <span>Print & Tech</span>
+            <img src={logoUrl} alt="Pings Communications" className="h-8 w-8" />
+            <span>Pings Communications</span>
           </Link>
 
           {/* Desktop Nav */}

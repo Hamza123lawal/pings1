@@ -37,11 +37,11 @@ export default function Home() {
               className="space-y-8"
             >
               <h1 className="text-5xl lg:text-7xl font-bold leading-tight text-foreground">
-                Print, Tech & <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Everything</span> In Between
+                Communication <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Solutions</span> For Everyone
               </h1>
               <p className="text-xl text-muted-foreground max-w-lg">
-                Your one-stop destination for premium printing services, computer accessories, and professional skills training.
+                Your complete platform for printing, technology, and professional services. Pings Communications delivers quality and innovation.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/services">
