@@ -16,6 +16,7 @@ export const items = pgTable("items", {
   description: text("description").notNull(),
   price: text("price"), // Text to handle "Starts from $10" or exact amounts
   imageUrl: text("image_url").notNull(),
+  isInShop: boolean("is_in_shop").notNull().default(true), // Controls visibility in shop page
 });
 
 export const messages = pgTable("messages", {

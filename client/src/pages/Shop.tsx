@@ -59,13 +59,15 @@ export default function Shop() {
   }
 
   // Filter only accessories category if it exists, otherwise show all items that look like products
-  // Ideally this logic should be in the backend or have a specific 'type' field, but relying on category names for now
+  // Also filter to only show items where isInShop is true
   const accessoriesCategory = categories?.find(c => c.slug === "computer-accessories");
-  const shopItems = items?.filter(item => 
-    accessoriesCategory 
+  const shopItems = items?.filter(item => {
+    const isInCorrectCategory = accessoriesCategory 
       ? item.categoryId === accessoriesCategory.id 
-      : item.price !== null // Fallback: show anything with a price
-  );
+      : item.price !== null;
+    const isInShop = (item as any).isInShop !== false; // Default to true if not specified
+    return isInCorrectCategory && isInShop;
+  });
 
   return (
     <div className="min-h-screen bg-background">
