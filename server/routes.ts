@@ -39,6 +39,26 @@ export async function registerRoutes(
     res.json(item);
   });
 
+  app.patch("/api/items/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { isInShop } = req.body;
+      
+      if (typeof isInShop !== "boolean") {
+        return res.status(400).json({ message: "isInShop must be a boolean" });
+      }
+
+      const updated = await storage.updateItem(id, { isInShop });
+      if (!updated) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      res.json(updated);
+    } catch (err) {
+      console.error("Error updating item:", err);
+      res.status(500).json({ message: "Failed to update item" });
+    }
+  });
+
   app.post(api.messages.create.path, async (req, res) => {
     try {
       const input = api.messages.create.input.parse(req.body);

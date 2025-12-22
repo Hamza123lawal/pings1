@@ -9,6 +9,7 @@ import Services from "@/pages/Services";
 import Shop from "@/pages/Shop";
 import Contact from "@/pages/Contact";
 import Cart from "@/pages/Cart";
+import ShopManagement from "@/pages/ShopManagement";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/shop" component={Shop} />
       <Route path="/contact" component={Contact} />
       <Route path="/cart" component={Cart} />
+      <Route path="/admin/shop-management" component={ShopManagement} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -17,6 +17,7 @@ export interface IStorage {
   getCategoryBySlug(slug: string): Promise<Category | undefined>;
   getItems(categorySlug?: string): Promise<Item[]>;
   getItem(id: number): Promise<Item | undefined>;
+  updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined>;
   createMessage(message: InsertMessage): Promise<Message>;
   getCart(sessionId: string): Promise<(CartItem & { item: Item })[]>;
   addToCart(sessionId: string, itemId: number, quantity: number): Promise<CartItem>;
@@ -47,6 +48,15 @@ export class DatabaseStorage implements IStorage {
   async getItem(id: number): Promise<Item | undefined> {
     const [item] = await db.select().from(items).where(eq(items.id, id));
     return item;
+  }
+
+  async updateItem(id: number, updates: Partial<Item>): Promise<Item | undefined> {
+    const [updated] = await db
+      .update(items)
+      .set(updates)
+      .where(eq(items.id, id))
+      .returning();
+    return updated;
   }
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
