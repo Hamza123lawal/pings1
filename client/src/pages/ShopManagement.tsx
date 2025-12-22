@@ -113,7 +113,7 @@ export default function ShopManagement() {
             <div>
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Eye className="h-6 w-6 text-green-600" />
-                Showing in Shop ({shopItems.length})
+                Showing in Shop ({ shopItems.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {shopItems.map((item) => (
