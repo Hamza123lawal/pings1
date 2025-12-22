@@ -121,13 +121,6 @@ export function Navigation() {
                   <Link href="/contact" onClick={() => setIsOpen(false)}>
                     <Button className="w-full mt-4">Get a Quote</Button>
                   </Link>
-                  <div className="border-t pt-6">
-                    <Link href="/admin/shop-management" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" className="w-full">
-                        Manage Shop Items
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>
