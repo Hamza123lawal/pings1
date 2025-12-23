@@ -152,7 +152,7 @@ export class DatabaseStorage implements IStorage {
 
       await db.insert(items).values([
         // Printing
-        { categoryId: printCat.id, name: "Business Cards", description: "Premium matte or glossy business cards", price: "Starting at $20/100", imageUrl: "https://images.unsplash.com/photo-1593182440959-9d5165b29b59?w=800&q=80" },
+        { categoryId: printCat.id, name: "Business Cards", description: "Premium matte or glossy business cards", price: "Starting at $20/100", imageUrl: "https://images.unsplash.com/photo-1495846414472-6696652d955f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
         { categoryId: printCat.id, name: "Custom T-Shirts", description: "DTG or Screen Printing on high quality cotton", price: "$15 each", imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80" },
         { categoryId: printCat.id, name: "Large Format Banners", description: "Durable vinyl banners for events", price: "$5/sq ft", imageUrl: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80" },
         { categoryId: printCat.id, name: "Monogramming", description: "Personalized embroidery and monogramming on apparel", price: "$10-$50", imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
