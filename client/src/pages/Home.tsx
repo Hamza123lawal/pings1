@@ -117,7 +117,7 @@ export default function Home() {
                 description="Wide range of computer peripherals including keyboards, mice, and cables."
                 icon={<Laptop className="h-6 w-6" />}
                 // Computer accessories setup
-                imageUrl="https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=600&q=80"
+                imageUrl="https://images.unsplash.com/photo-1646489099036-e22a9d506a32?q=80&w=724&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 href="/shop"
               />
             </motion.div>
@@ -128,7 +128,7 @@ export default function Home() {
                 description="Professional documentation, data entry, and formatting services."
                 icon={<PenTool className="h-6 w-6" />}
                 // Typing hands on keyboard
-                imageUrl="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80"
+                imageUrl="https://images.unsplash.com/photo-1519337265831-281ec6cc8514?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 href="/services?cat=typing"
               />
             </motion.div>
