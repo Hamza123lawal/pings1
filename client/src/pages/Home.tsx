@@ -106,7 +106,7 @@ export default function Home() {
                 description="High-quality banners, flyers, business cards, and custom t-shirt printing."
                 icon={<Printer className="h-6 w-6" />}
                 // Printing press or colorful prints
-                imageUrl="https://images.unsplash.com/photo-1562654501-a0ccc0fc3fb1?w=600&q=80"
+                imageUrl="https://images.unsplash.com/photo-1495846414472-6696652d955f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 href="/services?cat=printing"
               />
             </motion.div>
