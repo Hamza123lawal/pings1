@@ -59,6 +59,40 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/services", async (req, res) => {
+    try {
+      const { name, categoryId, description, price, imageUrl } = req.body;
+      
+      if (!name || !categoryId || !description || !imageUrl) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const newItem = await storage.createItem({
+        categoryId: Number(categoryId),
+        name,
+        description,
+        price: price || null,
+        imageUrl,
+        isInShop: false,
+      });
+      res.status(201).json(newItem);
+    } catch (err) {
+      console.error("Error creating service:", err);
+      res.status(500).json({ message: "Failed to create service" });
+    }
+  });
+
+  app.delete("/api/services/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      await storage.deleteItem(id);
+      res.status(200).json({ message: "Service deleted" });
+    } catch (err) {
+      console.error("Error deleting service:", err);
+      res.status(500).json({ message: "Failed to delete service" });
+    }
+  });
+
   app.post(api.messages.create.path, async (req, res) => {
     try {
       const input = api.messages.create.input.parse(req.body);
