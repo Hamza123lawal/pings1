@@ -14,7 +14,7 @@ export function Footer() {
               <span>Pings Communications</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
-              Your one-stop solution for professional printing, quality computer accessories, and expert training services.
+              Your one-stop solution for professional printing, quality designs, quality computer accessories, and expert training services.
             </p>
           </div>
 
