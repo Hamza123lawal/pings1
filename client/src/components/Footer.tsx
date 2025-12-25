@@ -10,9 +10,7 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-bold text-xl text-white">
-              <div className="bg-primary text-white p-1.5 rounded-lg">
-                <img src={logoUrl} alt="Pings Communications" className="h-8 w-8" />
-              </div>
+              <img src={logoUrl} alt="Pings Communications" className="h-10 w-10" />
               <span>Pings Communications</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed">
