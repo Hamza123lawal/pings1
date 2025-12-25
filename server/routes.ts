@@ -3,6 +3,9 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import { Resend } from "resend";
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function registerRoutes(
   httpServer: Server,
@@ -98,12 +101,42 @@ export async function registerRoutes(
       const input = api.messages.create.input.parse(req.body);
       const message = await storage.createMessage(input);
       
-      // LOGIC: In a real production app, we would use a service like SendGrid, Mailgun, or AWS SES.
-      // For now, we simulate the email sending by logging it to the console with the target email.
-      console.log(`[EMAIL SIMULATION] Sending message to: lawalhamzah2@gmail.com`);
-      console.log(`[EMAIL SIMULATION] From: ${input.name} (${input.email})`);
-      console.log(`[EMAIL SIMULATION] Subject: ${input.subject}`);
-      console.log(`[EMAIL SIMULATION] Content: ${input.message}`);
+      if (resend) {
+        try {
+          await resend.emails.send({
+            from: 'Pings Communications <onboarding@resend.dev>',
+            to: 'lawalhamzah2@gmail.com',
+            subject: `New Message from ${input.name}: ${input.subject}`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
+                <h2 style="color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">New Contact Form Submission</h2>
+                <div style="margin-top: 20px;">
+                  <p><strong>Name:</strong> ${input.name}</p>
+                  <p><strong>Email:</strong> <a href="mailto:${input.email}">${input.email}</a></p>
+                  <p><strong>Subject:</strong> ${input.subject}</p>
+                  <div style="margin-top: 20px; padding: 15px; background-color: #f8fafc; border-radius: 8px;">
+                    <p style="margin-top: 0; font-weight: bold; color: #64748b;">Message:</p>
+                    <p style="white-space: pre-wrap; line-height: 1.6; color: #334155;">${input.message}</p>
+                  </div>
+                </div>
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
+                  Sent from Pings Communications Business Website
+                </div>
+              </div>
+            `,
+          });
+          console.log(`[RESEND] Email sent to lawalhamzah2@gmail.com`);
+        } catch (emailError) {
+          console.error(`[RESEND] Failed to send email:`, emailError);
+        }
+      } else {
+        // LOGIC: In a real production app, we would use a service like SendGrid, Mailgun, or AWS SES.
+        // For now, we simulate the email sending by logging it to the console with the target email.
+        console.log(`[EMAIL SIMULATION] Sending message to: lawalhamzah2@gmail.com`);
+        console.log(`[EMAIL SIMULATION] From: ${input.name} (${input.email})`);
+        console.log(`[EMAIL SIMULATION] Subject: ${input.subject}`);
+        console.log(`[EMAIL SIMULATION] Content: ${input.message}`);
+      }
 
       res.status(201).json(message);
     } catch (err) {
