@@ -20,7 +20,7 @@ export default function Services() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Services & Products</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Browse our comprehensive catalog of printing services, computer accessories, and training programs.
+            Browse our comprehensive catalog of printing services, Graphics design services, computer accessories, and training programs.
           </p>
         </div>
       </div>

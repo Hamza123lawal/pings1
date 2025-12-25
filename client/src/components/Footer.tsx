@@ -10,7 +10,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-bold text-xl text-white">
               <div className="bg-primary text-white p-1.5 rounded-lg">
-                <Printer className="h-5 w-5" />
+                <img src="/logo.png" alt="Pings Logo" className="h-8 w-8" />
               </div>
               <span>Pings Communications</span>
             </div>
@@ -62,7 +62,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} Print & Tech Solutions. All rights reserved.
+          © {new Date().getFullYear()} Pings Communications. All rights reserved.
         </div>
       </div>
     </footer>
