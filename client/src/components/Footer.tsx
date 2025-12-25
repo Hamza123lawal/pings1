@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Printer, MapPin, Phone, Mail, Facebook, Twitter, Instagram } from "lucide-react";
+import logoUrl from "@assets/logo_1766422303390.png";
 
 export function Footer() {
   return (
@@ -10,7 +11,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-bold text-xl text-white">
               <div className="bg-primary text-white p-1.5 rounded-lg">
-                <img src="/logo.png" alt="Pings Logo" className="h-8 w-8" />
+                <img src={logoUrl} alt="Pings Communications" className="h-8 w-8" />
               </div>
               <span>Pings Communications</span>
             </div>
