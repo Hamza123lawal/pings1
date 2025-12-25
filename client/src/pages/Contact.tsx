@@ -84,7 +84,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg">Our Location</h3>
-                  <p className="text-muted-foreground">25 Ikotun Idimu Road<br />Ikotun, Lagos State</p>
+                  <p className="text-muted-foreground">27, Ikotun Idimu Road, behind Brt park<br />Ikotun, Alimosho, Lagos</p>
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function Contact() {
             {/* Google Maps Section */}
             <div className="h-64 bg-muted rounded-2xl overflow-hidden relative border border-border/50">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.8566416843467!2d3.2642647!3d6.5398236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8f729219b62f%3A0xe67543f4460f6071!2s25%20Ikotun%20Idimu%20Rd%2C%20Ikotun%2C%20Lagos!5e0!3m2!1sen!2sng!4v1713824567890!5m2!1sen!2sng"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.8566416843467!2d3.2642647!3d6.5398236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8f729219b62f%3A0xe67543f4460f6071!2s27%20Ikotun%20Idimu%20Rd%2C%20Ikotun%2C%20Lagos!5e0!3m2!1sen!2sng!4v1713824567890!5m2!1sen!2sng"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
