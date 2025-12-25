@@ -97,6 +97,14 @@ export async function registerRoutes(
     try {
       const input = api.messages.create.input.parse(req.body);
       const message = await storage.createMessage(input);
+      
+      // LOGIC: In a real production app, we would use a service like SendGrid, Mailgun, or AWS SES.
+      // For now, we simulate the email sending by logging it to the console with the target email.
+      console.log(`[EMAIL SIMULATION] Sending message to: pingstech@gmail.com`);
+      console.log(`[EMAIL SIMULATION] From: ${input.name} (${input.email})`);
+      console.log(`[EMAIL SIMULATION] Subject: ${input.subject}`);
+      console.log(`[EMAIL SIMULATION] Content: ${input.message}`);
+
       res.status(201).json(message);
     } catch (err) {
       if (err instanceof z.ZodError) {
