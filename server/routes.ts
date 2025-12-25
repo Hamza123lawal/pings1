@@ -2,6 +2,7 @@ import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
+import { insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 import { Resend } from "resend";
 
@@ -190,6 +191,113 @@ export async function registerRoutes(
   app.delete(api.cart.removeItem.path, async (req, res) => {
     await storage.removeFromCart(Number(req.params.id));
     res.status(204).send();
+  });
+
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const orderData = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(orderData);
+      
+      // Send confirmation email
+      if (resend) {
+        const items = JSON.parse(orderData.items);
+        const itemsHtml = items.map((item: any) => `
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${item.price}</td>
+          </tr>
+        `).join('');
+
+        try {
+          // Notification to Admin
+          await resend.emails.send({
+            from: 'Pings Communications <onboarding@resend.dev>',
+            to: 'lawalhamzah2@gmail.com',
+            subject: `New Order: #${order.id} from ${order.customerName}`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <h2 style="color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">New Order Received</h2>
+                <div style="margin-top: 20px;">
+                  <p><strong>Order ID:</strong> #${order.id}</p>
+                  <p><strong>Customer:</strong> ${order.customerName}</p>
+                  <p><strong>Email:</strong> ${order.customerEmail}</p>
+                  <p><strong>Phone:</strong> ${order.customerPhone}</p>
+                  <p><strong>Address:</strong> ${order.address}</p>
+                  <p><strong>Total:</strong> ${order.totalAmount}</p>
+                  <div style="margin-top: 20px;">
+                    <h3 style="color: #0f172a; margin-bottom: 10px;">Items:</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                      <thead>
+                        <tr style="background-color: #f8fafc;">
+                          <th style="text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0;">Item</th>
+                          <th style="text-align: center; padding: 8px; border-bottom: 2px solid #e2e8f0;">Qty</th>
+                          <th style="text-align: right; padding: 8px; border-bottom: 2px solid #e2e8f0;">Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${itemsHtml}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            `,
+          });
+
+          // Confirmation to Customer
+          await resend.emails.send({
+            from: 'Pings Communications <onboarding@resend.dev>',
+            to: order.customerEmail,
+            subject: `Order Confirmation: #${order.id}`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <h2 style="color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Order Confirmation</h2>
+                <p>Hello ${order.customerName},</p>
+                <p>Thank you for your order! We have received it and are processing it now.</p>
+                <div style="margin-top: 20px; padding: 15px; background-color: #f8fafc; border-radius: 8px;">
+                  <p><strong>Order ID:</strong> #${order.id}</p>
+                  <p><strong>Total Amount:</strong> ${order.totalAmount}</p>
+                  <p><strong>Delivery Address:</strong> ${order.address}</p>
+                </div>
+                <div style="margin-top: 20px;">
+                  <h3 style="color: #0f172a; margin-bottom: 10px;">Order Details:</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr style="background-color: #f8fafc;">
+                        <th style="text-align: left; padding: 8px; border-bottom: 2px solid #e2e8f0;">Item</th>
+                        <th style="text-align: center; padding: 8px; border-bottom: 2px solid #e2e8f0;">Qty</th>
+                        <th style="text-align: right; padding: 8px; border-bottom: 2px solid #e2e8f0;">Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${itemsHtml}
+                    </tbody>
+                  </table>
+                </div>
+                <p style="margin-top: 30px;">We'll contact you at ${order.customerPhone} if we need any further information.</p>
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
+                  Thank you for shopping with Pings Communications
+                </div>
+              </div>
+            `,
+          });
+        } catch (emailErr) {
+          console.error("Failed to send order emails:", emailErr);
+        }
+      }
+
+      // Clear the cart
+      await storage.clearCart(orderData.sessionId);
+
+      res.status(201).json(order);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Error creating order:", err);
+      res.status(500).json({ message: "Failed to create order" });
+    }
   });
 
   return httpServer;

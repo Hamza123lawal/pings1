@@ -211,9 +211,11 @@ export default function Cart() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2">
-                  <Button className="w-full" size="lg" data-testid="button-checkout">
-                    Proceed to Checkout
-                  </Button>
+                  <Link href="/checkout" className="w-full">
+                    <Button className="w-full" size="lg" data-testid="button-checkout">
+                      Proceed to Checkout
+                    </Button>
+                  </Link>
                   <Link href="/shop" className="w-full">
                     <Button variant="outline" className="w-full">
                       Continue Shopping

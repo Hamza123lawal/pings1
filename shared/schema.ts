@@ -43,5 +43,21 @@ export type Item = typeof items.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Message = typeof messages.$inferSelect;
 export type CartItem = typeof cartItems.$inferSelect;
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+  address: text("address").notNull(),
+  totalAmount: text("total_amount").notNull(),
+  status: text("status").notNull().default("pending"),
+  items: text("items").notNull(), // JSON string of ordered items
+  createdAt: text("created_at").notNull(),
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({ id: true });
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type InsertCartItem = z.infer<typeof insertCartItemSchema>;

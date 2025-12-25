@@ -4,13 +4,16 @@ import {
   categories,
   messages,
   cartItems,
+  orders,
   type Item,
   type Category,
   type Message,
   type CartItem,
-  type InsertMessage
+  type Order,
+  type InsertMessage,
+  type InsertOrder
 } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   getCategories(): Promise<Category[]>;
@@ -25,6 +28,8 @@ export interface IStorage {
   addToCart(sessionId: string, itemId: number, quantity: number): Promise<CartItem>;
   updateCartItem(cartItemId: number, quantity: number): Promise<CartItem>;
   removeFromCart(cartItemId: number): Promise<void>;
+  clearCart(sessionId: string): Promise<void>;
+  createOrder(order: InsertOrder): Promise<Order>;
   seedData(): Promise<void>;
 }
 
@@ -98,7 +103,7 @@ export class DatabaseStorage implements IStorage {
     const existing = await db
       .select()
       .from(cartItems)
-      .where(eq(cartItems.sessionId, sessionId) && eq(cartItems.itemId, itemId));
+      .where(and(eq(cartItems.sessionId, sessionId), eq(cartItems.itemId, itemId)));
     
     if (existing.length > 0) {
       // Update quantity
@@ -128,6 +133,15 @@ export class DatabaseStorage implements IStorage {
 
   async removeFromCart(cartItemId: number): Promise<void> {
     await db.delete(cartItems).where(eq(cartItems.id, cartItemId));
+  }
+
+  async clearCart(sessionId: string): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.sessionId, sessionId));
+  }
+
+  async createOrder(insertOrder: InsertOrder): Promise<Order> {
+    const [order] = await db.insert(orders).values(insertOrder).returning();
+    return order;
   }
 
   async seedData(): Promise<void> {
