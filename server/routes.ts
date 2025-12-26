@@ -283,7 +283,7 @@ export async function registerRoutes(
                 </div>
               `,
             });
-            console.log(`[RESEND] Confirmation email sent to customer: ${order.customerEmail}`, customerEmailResult);
+            console.log(`[RESEND] Customer confirmation attempt for ${order.customerEmail}:`, customerEmailResult);
           } catch (customerEmailErr) {
             console.error("Failed to send customer confirmation email:", customerEmailErr);
           }

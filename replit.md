@@ -51,7 +51,10 @@ The `shared/` directory contains code used by both frontend and backend:
 - **Neon PostgreSQL**: Serverless PostgreSQL database, connection via `DATABASE_URL` environment variable
 
 ### Email Service
-- **Resend**: Email delivery service for contact form submissions, requires `RESEND_API_KEY` environment variable (optional - gracefully degrades if not set)
+- **Resend**: Email delivery service for contact form submissions and order confirmations. Requires `RESEND_API_KEY` environment variable.
+  - Contact form notifications are sent to `lawalhamzah2@gmail.com`.
+  - Order confirmations are sent to both the admin (`lawalhamzah2@gmail.com`) and the customer.
+  - Note: Customer emails are currently sent using the `onboarding@resend.dev` address due to Resend sandbox limitations.
 
 ### Third-Party UI Libraries
 - **Radix UI**: Headless component primitives for accessible UI components
