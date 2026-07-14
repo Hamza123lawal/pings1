@@ -1,67 +1,47 @@
 # Pings Communications
 
-## Overview
+A full-stack printing & tech retail web app for **Pings Communications**, offering printing services, tech products, and professional training.
 
-Pings Communications is a full-stack e-commerce and service platform for a business offering printing services, graphic design, computer accessories, and training programs. The application features a customer-facing storefront with shopping cart functionality, a services catalog, contact form with email integration, and admin management pages for controlling shop inventory and service listings.
+## Stack
 
-## User Preferences
+- **Frontend**: React 18 + Vite, Tailwind CSS, Radix UI, Framer Motion, Wouter (routing)
+- **Backend**: Express.js (TypeScript, tsx)
+- **Database**: PostgreSQL via Replit's managed database, accessed with Drizzle ORM + Neon serverless driver
+- **Email**: Resend (optional — set `RESEND_API_KEY` to enable order/contact emails)
 
-Preferred communication style: Simple, everyday language.
+## How to run
 
-## System Architecture
+The app runs on a single workflow: `Start application` → `npm run dev`  
+It serves both the API and the Vite dev server on **port 5000**.
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Routing**: Wouter (lightweight React router)
-- **State Management**: TanStack React Query for server state caching and synchronization
-- **Styling**: Tailwind CSS with shadcn/ui component library (New York style variant)
-- **Animations**: Framer Motion for page transitions and component animations
-- **Icons**: Lucide React
-- **Forms**: React Hook Form with Zod validation via @hookform/resolvers
+## Database
 
-### Backend Architecture
-- **Runtime**: Node.js with Express.js
-- **Language**: TypeScript with ESM modules
-- **Build Tool**: Custom build script using esbuild for server and Vite for client
-- **API Pattern**: RESTful endpoints defined in `shared/routes.ts` with Zod schemas for type-safe request/response validation
+Schema is managed with Drizzle ORM. To push schema changes to the database:
 
-### Data Storage
-- **Database**: PostgreSQL via Neon Serverless (@neondatabase/serverless)
-- **ORM**: Drizzle ORM with drizzle-zod for schema-to-validation integration
-- **Schema Location**: `shared/schema.ts` contains all table definitions
-- **Tables**: categories, items, messages, cartItems
+```
+npm run db:push
+```
 
-### Shared Code Pattern
-The `shared/` directory contains code used by both frontend and backend:
-- `schema.ts`: Drizzle table definitions and Zod insert schemas
-- `routes.ts`: API route definitions with path patterns and response schemas
+Tables: `categories`, `items`, `cart_items`, `orders`, `messages`
 
-### Build and Development
-- **Development**: Vite dev server with HMR proxied through Express
-- **Production**: Static files served from `dist/public`, server bundled to `dist/index.cjs`
-- **Database Migrations**: Drizzle Kit with `db:push` command
+## Environment variables
 
-### Session Management
-- Cart functionality uses client-side session IDs stored in localStorage
-- No user authentication currently implemented
+| Variable | Required | Notes |
+|---|---|---|
+| `DATABASE_URL` | ✅ Yes | Auto-provided by Replit's managed PostgreSQL |
+| `SESSION_SECRET` | ✅ Yes | Set as a Replit Secret |
+| `RESEND_API_KEY` | Optional | Enables email on orders/contact form |
 
-## External Dependencies
+## Pages
 
-### Database
-- **Neon PostgreSQL**: Serverless PostgreSQL database, connection via `DATABASE_URL` environment variable
+- `/` — Home / landing page
+- `/services` — Services catalogue
+- `/shop` — Product shop with cart
+- `/checkout` — Checkout form
+- `/contact` — Contact / quote form
+- `/service-management` — Admin: manage service listings
+- `/shop-management` — Admin: toggle shop item visibility
 
-### Email Service
-- **Resend**: Email delivery service for contact form submissions and order confirmations. Requires `RESEND_API_KEY` environment variable.
-  - Contact form notifications are sent to `lawalhamzah2@gmail.com`.
-  - Order confirmations are sent to both the admin (`lawalhamzah2@gmail.com`) and the customer.
-  - Note: Customer emails are currently sent using the `onboarding@resend.dev` address due to Resend sandbox limitations.
+## User preferences
 
-### Third-Party UI Libraries
-- **Radix UI**: Headless component primitives for accessible UI components
-- **shadcn/ui**: Pre-styled component library built on Radix primitives
-- **Embla Carousel**: Carousel/slider functionality
-- **CMDK**: Command palette component
-- **Vaul**: Drawer component
-
-### Development Tools
-- **Replit Plugins**: Runtime error overlay, cartographer, and dev banner for Replit environment integration
+- Keep the existing project structure and stack — do not restructure or migrate.
