@@ -17,6 +17,19 @@ const gmailTransport =
       })
     : null;
 
+// Verify Gmail connection at startup
+if (gmailTransport) {
+  gmailTransport.verify((error) => {
+    if (error) {
+      console.error("[GMAIL] SMTP connection failed:", error.message);
+    } else {
+      console.log("[GMAIL] SMTP connection verified — ready to send emails");
+    }
+  });
+} else {
+  console.warn("[GMAIL] Transport not initialised — GMAIL_USER or GMAIL_APP_PASSWORD missing");
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
