@@ -24,6 +24,7 @@ const allowlist = [
   "passport",
   "passport-local",
   "pg",
+  "resend",
   "stripe",
   "uuid",
   "ws",
@@ -55,7 +56,7 @@ async function buildAll() {
     define: {
       "process.env.NODE_ENV": '"production"',
     },
-    minify: true,
+    minify: false,
     external: externals,
     logLevel: "info",
   });
