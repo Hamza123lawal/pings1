@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Printer, MapPin, Phone, Mail, Facebook, Twitter, Instagram } from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Settings } from "lucide-react";
 import logoUrl from "@assets/logo_1766422303390.png";
 
 export function Footer() {
@@ -48,7 +48,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter / Social */}
+          {/* Social + Admin */}
           <div>
             <h3 className="text-white font-bold mb-4">Follow Us</h3>
             <div className="flex gap-4 mb-6">
@@ -56,6 +56,22 @@ export function Footer() {
               <a href="#" className="bg-slate-800 p-2 rounded-lg hover:bg-primary hover:text-white transition-colors"><Twitter className="h-5 w-5" /></a>
               <a href="#" className="bg-slate-800 p-2 rounded-lg hover:bg-primary hover:text-white transition-colors"><Instagram className="h-5 w-5" /></a>
             </div>
+
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+              <Settings className="h-4 w-4" /> Admin
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/admin/shop-management" className="text-slate-400 hover:text-primary transition-colors text-sm">
+                  Manage Shop
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/service-management" className="text-slate-400 hover:text-primary transition-colors text-sm">
+                  Manage Services
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
         
