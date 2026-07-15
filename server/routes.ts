@@ -4,9 +4,18 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const gmailTransport =
+  process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD
+    ? nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      })
+    : null;
 
 export async function registerRoutes(
   httpServer: Server,
@@ -102,14 +111,14 @@ export async function registerRoutes(
       const input = api.messages.create.input.parse(req.body);
       const message = await storage.createMessage(input);
       
-      if (resend) {
+      if (gmailTransport) {
         try {
-          await resend.emails.send({
-            from: 'Pings Communications <onboarding@resend.dev>',
+          await gmailTransport.sendMail({
+            from: `"Pings Communications" <${process.env.GMAIL_USER}>`,
             to: 'lawalhamzah2@gmail.com',
             subject: `New Message from ${input.name}: ${input.subject}`,
             html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
                 <h2 style="color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">New Contact Form Submission</h2>
                 <div style="margin-top: 20px;">
                   <p><strong>Name:</strong> ${input.name}</p>
@@ -126,13 +135,11 @@ export async function registerRoutes(
               </div>
             `,
           });
-          console.log(`[RESEND] Email sent to lawalhamzah2@gmail.com`);
+          console.log(`[GMAIL] Email sent to lawalhamzah2@gmail.com`);
         } catch (emailError) {
-          console.error(`[RESEND] Failed to send email:`, emailError);
+          console.error(`[GMAIL] Failed to send email:`, emailError);
         }
       } else {
-        // LOGIC: In a real production app, we would use a service like SendGrid, Mailgun, or AWS SES.
-        // For now, we simulate the email sending by logging it to the console with the target email.
         console.log(`[EMAIL SIMULATION] Sending message to: lawalhamzah2@gmail.com`);
         console.log(`[EMAIL SIMULATION] From: ${input.name} (${input.email})`);
         console.log(`[EMAIL SIMULATION] Subject: ${input.subject}`);
@@ -199,7 +206,7 @@ export async function registerRoutes(
       const order = await storage.createOrder(orderData);
       
       // Send confirmation email
-      if (resend) {
+      if (gmailTransport) {
         const items = JSON.parse(orderData.items);
         const itemsHtml = items.map((item: any) => `
           <tr>
@@ -211,8 +218,8 @@ export async function registerRoutes(
 
         try {
           // Notification to Admin
-          await resend.emails.send({
-            from: 'Pings Communications <onboarding@resend.dev>',
+          await gmailTransport.sendMail({
+            from: `"Pings Communications" <${process.env.GMAIL_USER}>`,
             to: 'lawalhamzah2@gmail.com',
             subject: `New Order: #${order.id} from ${order.customerName}`,
             html: `
@@ -247,8 +254,8 @@ export async function registerRoutes(
 
           // Confirmation to Customer
           try {
-            const customerEmailResult = await resend.emails.send({
-              from: 'Pings Communications <onboarding@resend.dev>',
+            await gmailTransport.sendMail({
+              from: `"Pings Communications" <${process.env.GMAIL_USER}>`,
               to: order.customerEmail,
               subject: `Order Confirmation: #${order.id}`,
               html: `
@@ -283,7 +290,7 @@ export async function registerRoutes(
                 </div>
               `,
             });
-            console.log(`[RESEND] Customer confirmation attempt for ${order.customerEmail}:`, customerEmailResult);
+            console.log(`[GMAIL] Customer confirmation sent to ${order.customerEmail}`);
           } catch (customerEmailErr) {
             console.error("Failed to send customer confirmation email:", customerEmailErr);
           }
